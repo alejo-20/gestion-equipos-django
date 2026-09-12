@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Prestar - {{ equipo.nombre }}{% endblock %}
+
+{% block content %}
+    <h1>Prestar equipo: {{ equipo.nombre }}</h1>
+    <div class="detail-card">
+        {% if equipo.disponible %}
+            <p>Completa el formulario para registrar el prestamo de <strong>{{ equipo.nombre }}</strong> ({{ equipo.get_tipo_display }}).</p>
+            <form method="post">
+                {% csrf_token %}
+                <label for="nombre_persona">Nombre de la persona:</label><br>
+                <input type="text" name="nombre_persona" id="nombre_persona" required placeholder="Ej: Juan Perez"><br><br>
+                <button type="submit" class="btn-submit">Registrar prestamo</button>
+            </form>
+        {% else %}
+            <p>Este equipo ya se encuentra prestado y no esta disponible.</p>
+        {% endif %}
+        <p style="margin-top:16px;">
+            <a class="btn btn-primary" href="{% url 'inventario:detalle_equipo' equipo.id %}">Volver al detalle</a>
+        </p>
+    </div>
+{% endblock %}

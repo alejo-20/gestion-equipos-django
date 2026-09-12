@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle - {{ equipo.nombre }}{% endblock %}
+
+{% block content %}
+    <h1>Detalle del equipo</h1>
+    <div class="detail-card">
+        <p><strong>Nombre:</strong> {{ equipo.nombre }}</p>
+        <p><strong>Tipo:</strong> {{ equipo.get_tipo_display }}</p>
+        <p>
+            <strong>Estado:</strong>
+            {% if equipo.disponible %}
+                <span class="badge ok">Disponible</span>
+            {% else %}
+                <span class="badge no">Prestado</span>
+            {% endif %}
+        </p>
+        <p>
+            <a class="btn btn-primary" href="{% url 'inventario:lista_equipos' %}">Volver al inventario</a>
+            {% if equipo.disponible %}
+                <a class="btn btn-success" href="{% url 'prestamos:prestar_equipo' equipo.id %}">Prestar equipo</a>
+            {% endif %}
+        </p>
+    </div>
+{% endblock %}

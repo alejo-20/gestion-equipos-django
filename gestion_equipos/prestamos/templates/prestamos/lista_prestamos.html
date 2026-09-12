@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Prestamos activos - Gestion de Equipos{% endblock %}
+
+{% block content %}
+    <h1>Prestamos activos</h1>
+    {% if prestamos %}
+    <table>
+        <thead>
+            <tr>
+                <th>Equipo</th>
+                <th>Persona</th>
+                <th>Fecha de prestamo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prestamo in prestamos %}
+            <tr>
+                <td>{{ prestamo.equipo.nombre }}</td>
+                <td>{{ prestamo.nombre_persona }}</td>
+                <td>{{ prestamo.fecha_prestamo|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <a class="btn btn-danger" href="{% url 'prestamos:devolver_prestamo' prestamo.id %}">Registrar devolucion</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="msg msg-info">No hay prestamos activos en este momento.</div>
+    {% endif %}
+{% endblock %}

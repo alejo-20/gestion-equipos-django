@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestion de Equipos{% endblock %}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, Helvetica, sans-serif; background: #f4f6f9; color: #333; }
+        nav { background: #1f3a5f; padding: 12px 24px; }
+        nav a { color: #fff; text-decoration: none; margin-right: 24px; font-weight: bold; }
+        nav a:hover { text-decoration: underline; }
+        main { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+        h1 { margin-bottom: 16px; color: #1f3a5f; }
+        table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+        th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e2e6ea; }
+        th { background: #1f3a5f; color: #fff; }
+        tr:hover td { background: #f0f4f8; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: .85em; color: #fff; }
+        .ok { background: #2e8b57; }
+        .no { background: #c0392b; }
+        .btn { display: inline-block; padding: 8px 14px; border-radius: 6px; text-decoration: none; color: #fff; font-size: .9em; }
+        .btn-primary { background: #1f3a5f; }
+        .btn-success { background: #2e8b57; }
+        .btn-danger { background: #c0392b; }
+        .btn:hover { opacity: .85; }
+        .detail-card { background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+        .detail-card p { margin: 8px 0; }
+        input[type=text], button[type=submit] { padding: 10px 14px; border-radius: 6px; border: 1px solid #ccc; font-size: 1em; }
+        .btn-submit { background: #2e8b57; color: #fff; border: none; cursor: pointer; }
+        .msg { padding: 12px; border-radius: 6px; margin-bottom: 16px; }
+        .msg-info { background: #d9edf7; color: #1f3a5f; }
+        footer { text-align: center; color: #888; padding: 24px; font-size: .85em; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'inventario:lista_equipos' %}">Inventario</a>
+        <a href="{% url 'prestamos:lista_prestamos_activos' %}">Prestamos activos</a>
+        <a href="/admin/">Admin</a>
+    </nav>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>Gestion de Equipos - Control de inventario y prestamos</footer>
+</body>
+</html>

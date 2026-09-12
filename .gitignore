@@ -1,0 +1,30 @@
+# Django
+*.log
+*.pot
+*.py[cod]
+__pycache__/
+*.pyo
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+local_settings.py
+
+# Environments
+.env
+.env.*
+venv/
+.venv/
+env/
+ENV/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
