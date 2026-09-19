@@ -17,6 +17,7 @@
         </p>
         <p>
             <a class="btn btn-primary" href="{% url 'inventario:lista_equipos' %}">Volver al inventario</a>
+            <a class="btn btn-primary" href="{% url 'inventario:mantenimientos_equipo' equipo.id %}">Ver historial de mantenimientos</a>
             {% if equipo.disponible %}
                 <a class="btn btn-success" href="{% url 'prestamos:prestar_equipo' equipo.id %}">Prestar equipo</a>
             {% endif %}
