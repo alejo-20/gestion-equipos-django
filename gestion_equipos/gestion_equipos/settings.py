@@ -19,6 +19,8 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Carga las variables definidas en el archivo .env (si existe).
+# Primero el .env de la raiz del repositorio y luego uno local a Django.
+load_dotenv(BASE_DIR.parent / ".env")
 load_dotenv(BASE_DIR / ".env")
 
 
