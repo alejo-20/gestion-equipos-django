@@ -1,6 +1,13 @@
 asgiref==3.12.1
 Django==5.2.17
+# Chatbot: la Interactions API de Gemini requiere google-genai >= 2.3.0.
+google-genai==2.25.0
+# Driver de PostgreSQL: la tabla `equipo` es la misma que usan los tres
+# microservicios (Java, Node y PHP), asi que Django tiene que poder hablar Postgres.
+# El mismo driver (psycopg2) ya lo usa microservicio/main.py.
+psycopg2-binary==2.9.11
 python-dotenv==1.2.3
 requests==2.34.2
 sqlparse==0.6.0
 tzdata==2026.3
+gunicorn==23.0.0

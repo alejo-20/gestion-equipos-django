@@ -26,6 +26,15 @@ ENV/
 *.sublime-project
 *.sublime-workspace
 
+# Node
+node_modules/
+
+# Java/Maven
+target/
+
+# Logs
+*.log
+
 # OS
 .DS_Store
 Thumbs.db

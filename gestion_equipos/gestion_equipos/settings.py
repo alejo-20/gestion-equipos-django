@@ -33,7 +33,7 @@ SECRET_KEY = 'django-insecure-+24l&ruw$_+o9#^$b!b37m_t1rkjcwbz%0&*ql@ju(h9*qwybp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 
 # Application definition
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'inventario',
     'prestamos',
+    'chatbot',
 ]
 
 MIDDLEWARE = [
@@ -82,17 +83,93 @@ WSGI_APPLICATION = 'gestion_equipos.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# La tabla Equipo es la MISMA que usan los tres microservicios (Java, Node y PHP).
+# Por eso Django, Java (JPA), Node (pg) y PHP (PDO) apuntan a la misma base: si
+# Django se quedara en SQLite y los microservicios en Postgres, cada boton de
+# "Guardar con ..." escribiria en un lado y /api/equipos/ leeria del otro.
+#
+# Postgres se configura por variables de entorno. Si DB_HOST no esta definida se
+# cae a SQLite, que es lo que permite correr `manage.py test` y desarrollar sin
+# levantar una base. Igual se puede elegir el motor con DB_ENGINE=postgresql|sqlite.
+#
+# En .env:
+#   DB_ENGINE=postgresql
+#   DB_NAME=gestion_equipos
+#   DB_USER=gestion
+#   DB_PASSWORD=gestion_dev
+#   DB_HOST=localhost
+#   DB_PORT=5432
+
+DB_ENGINE = os.environ.get("DB_ENGINE", "").strip().lower()
+
+if DB_ENGINE in ("sqlite", "sqlite3"):
+    _USAR_POSTGRES = False
+elif DB_ENGINE in ("postgres", "postgresql"):
+    _USAR_POSTGRES = True
+else:
+    # Sin DB_ENGINE explicito, la presencia de DB_HOST decide: es lo unico que
+    # no tiene un default sensato para desarrollo local.
+    _USAR_POSTGRES = bool(os.environ.get("DB_HOST", "").strip())
+
+if _USAR_POSTGRES:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get("DB_NAME", "gestion_equipos"),
+            'USER': os.environ.get("DB_USER", "gestion"),
+            'PASSWORD': os.environ.get("DB_PASSWORD", ""),
+            'HOST': os.environ.get("DB_HOST", "localhost"),
+            'PORT': os.environ.get("DB_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Microservicio de mantenimientos (FastAPI).
 # Se lee de una variable de entorno y por defecto apunta al servicio local.
 MICROSERVICIO_URL = os.environ.get("MICROSERVICIO_URL", "http://localhost:8001")
+
+# ---------------------------------------------------------------------------
+# URLs de los tres microservicios de equipos y politica de lectura resiliente
+# ---------------------------------------------------------------------------
+#
+# Django NO lee estos servicios para /api/equipos/ ni para el chatbot (eso sigue
+# yendo al ORM, sin tocar). Estas URLs las usa solo `lista_equipos`, que por
+# pedido explicito consulta Node -> Java -> PHP -> ORM antes de renderizar.
+#
+# El orden importa: Node es el mas rapido (Express, menos capas), Java el que
+# tiene pool de conexiones y transacciones, y PHP el ultimo porque corre con el
+# servidor embebido. El timeout es corto a proposito (3s por intento) porque el
+# usuario esta esperando la pagina: es mejor tarde hasta 9s y mostrar la lista
+# desde el ORM que colgar la request indefinidamente.
+NODE_SERVICE_URL = os.environ.get("NODE_SERVICE_URL", "http://localhost:8082")
+JAVA_SERVICE_URL = os.environ.get("JAVA_SERVICE_URL", "http://localhost:8081")
+PHP_SERVICE_URL = os.environ.get("PHP_SERVICE_URL", "http://localhost:8083")
+
+# Segundos que puede tardar cada microservicio antes de pasar al siguiente.
+TIMEOUT_MICROSERVICIOS = float(os.environ.get("TIMEOUT_MICROSERVICIOS", "3"))
+
+# URL base del PROPIO proyecto, usada por las tools del chatbot para leer los
+# endpoints publicos /api/equipos/ y /api/prestamos/ por HTTP en vez de tocar el
+# ORM. En local el servidor corre en el 8000. Al desplegar hay que poner aca la
+# URL publica del servicio, porque 127.0.0.1:8000 ya no seria esta maquina.
+API_BASE_URL = os.environ.get("API_BASE_URL", "http://127.0.0.1:8000")
+
+
+# Chatbot con Gemini.
+# Se leen de variables de entorno y nunca se escriben aqui: la API key solo
+# debe existir en el .env (ignorado por git) y en el panel del proveedor.
+# La API key se usa solo en el servidor; nunca se envia al navegador.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+# Los modelos Flash funcionan en el plan gratuito de la API de Gemini.
+# Se deja en variable de entorno porque la oferta de modelos cambia seguido.
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.6-flash")
 
 
 # Password validation
@@ -130,6 +207,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Carpeta de assets del proyecto (hojas de estilo y JavaScript).
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

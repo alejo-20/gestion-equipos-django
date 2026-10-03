@@ -1,0 +1,83 @@
+services:
+  - type: web
+    name: microservicio-java
+    runtime: docker
+    rootDir: microservicio-java
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+  - type: web
+    name: microservicio-node
+    runtime: docker
+    rootDir: microservicio-node
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+  - type: web
+    name: microservicio-php
+    runtime: docker
+    rootDir: microservicio-php
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+  - type: web
+    name: gestion-equipos-django
+    runtime: python
+    rootDir: gestion_equipos
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn gestion_equipos.wsgi:application"
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,127.0.0.1,localhost"
+      - key: NODE_SERVICE_URL
+        fromService:
+          type: web
+          name: microservicio-node
+          property: host
+      - key: JAVA_SERVICE_URL
+        fromService:
+          type: web
+          name: microservicio-java
+          property: host
+      - key: PHP_SERVICE_URL
+        fromService:
+          type: web
+          name: microservicio-php
+          property: host
