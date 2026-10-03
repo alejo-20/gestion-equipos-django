@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Microservicio de Equipos (PHP) - API</title>
+
+    <!--
+        Swagger UI servido como archivo estatico, sin framework y sin paso de
+        build: es HTML + CSS + JS de un CDN, con la version fijada para que la
+        documentacion no cambie sola. Este servicio no genera su especificacion
+        (no hay anotaciones que las generen), asi que Swagger UI apunta al
+        openapi.yaml escrito a mano que vive en la raiz del microservicio y que
+        ademas se puede bajar entero desde /openapi.yaml.
+    -->
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
+    <style>
+        body { margin: 0; background: #fafafa; }
+        .aviso {
+            margin: 0; padding: 10px 16px; font-family: system-ui, sans-serif;
+            font-size: 14px; background: #fff3cd; color: #664d03;
+            border-bottom: 1px solid #ffe69c;
+        }
+    </style>
+</head>
+<body>
+    <div class="aviso" id="aviso" hidden></div>
+    <div id="swagger-ui"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js" crossorigin></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js" crossorigin></script>
+    <script>
+        window.onload = function () {
+            window.ui = SwaggerUIBundle({
+                // Ruta ABSOLUTA a proposito: /docs puede servirse en un subdirectorio
+                // (por ejemplo detrás de un proxy en /php/docs), y una ruta relativa
+                // se resolveria contra ese subdirectorio y daria 404.
+                url: '/openapi.yaml',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+                layout: 'StandaloneLayout',
+            });
+
+            // Si el navegador esta sin salida a internet, los assets del CDN no
+            // cargan y la pagina queda en blanco sin explicar nada. Se avisa en
+            // vez de dejar adivinar.
+            window.addEventListener('load', function () {
+                if (typeof SwaggerUIBundle === 'undefined') {
+                    var aviso = document.getElementById('aviso');
+                    aviso.hidden = false;
+                    aviso.textContent =
+                        'No se pudo cargar Swagger UI desde el CDN (sin salida a internet). ' +
+                        'La especificacion sigue disponible en /openapi.yaml.';
+                }
+            });
+        };
+    </script>
+</body>
+</html>

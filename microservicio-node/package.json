@@ -1,0 +1,21 @@
+{
+  "name": "microservicio-node-equipos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CRUD de la tabla `equipo` compartida, en Node.js + Express con el driver pg.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

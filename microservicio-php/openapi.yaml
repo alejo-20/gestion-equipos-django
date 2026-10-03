@@ -1,0 +1,271 @@
+# Especificacion OpenAPI del microservicio de equipos en PHP.
+#
+# A diferencia de Spring Boot (springdoc) o Node (swagger-jsdoc), aqui no hay
+# framework que genere la especificacion desde el codigo: se escribe a mano y se
+# mantiene al lado de index.php. Por esoSwagger UI, en /docs, es solo una vista
+# sobre este archivo.
+#
+# Este archivo es la fuente de verdad de la API: si se cambia una ruta o un
+# ejemplo, se cambia aca y en index.php.
+openapi: 3.0.3
+
+info:
+  title: Microservicio de Equipos (PHP)
+  version: '1.0.0'
+  description: >
+    CRUD de la tabla `equipo` compartida con el proyecto Django y con los
+    microservicios Java y Node. Es el tercero que Django consulta para leer el
+    inventario: primero Node, despues Java, y este ultimo antes de recurrir al
+    propio ORM de Django.
+
+
+    No usa ningun framework: el enrutado se resuelve por metodo HTTP y ruta en
+    `index.php`, y corre con `php -S 0.0.0.0:8083 index.php`.
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8083
+    description: Desarrollo local
+
+tags:
+  - name: equipos
+    description: Operaciones sobre la tabla compartida `equipo`
+
+paths:
+  /equipos:
+    get:
+      tags: [equipos]
+      summary: Lista todos los equipos
+      description: >
+        Devuelve el inventario completo, ordenado por id. Es el ultimo recurso
+        remoto que prueba Django antes de usar su propio ORM.
+      operationId: listarEquipos
+      responses:
+        '200':
+          description: Lista de equipos.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [equipos]
+                properties:
+                  equipos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Equipo'
+              example:
+                equipos:
+                  - id: 1
+                    nombre: Laptop Dell Latitude 7420
+                    tipo: laptop
+                    disponible: true
+                  - id: 3
+                    nombre: Proyector Epson EB-X50
+                    tipo: proyector
+                    disponible: true
+        '503':
+          $ref: '#/components/responses/ErrorDeBase'
+
+    post:
+      tags: [equipos]
+      summary: Inserta un equipo
+      description: >
+        Es el destino del boton "Guardar con PHP" del formulario de Django.
+      operationId: crearEquipo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipoRequest'
+            example:
+              nombre: Notebook Lenovo ThinkPad
+              tipo: laptop
+              disponible: true
+      responses:
+        '201':
+          description: Equipo creado. La cabecera Location trae la URL del nuevo recurso.
+          headers:
+            Location:
+              description: URL del equipo creado.
+              schema:
+                type: string
+              example: /equipos/7
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  equipo:
+                    $ref: '#/components/schemas/Equipo'
+        '400':
+          $ref: '#/components/responses/ErrorDeValidacion'
+        '503':
+          $ref: '#/components/responses/ErrorDeBase'
+
+  /equipos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdEquipo'
+
+    get:
+      tags: [equipos]
+      summary: Devuelve un equipo por id
+      operationId: obtenerEquipo
+      responses:
+        '200':
+          description: El equipo pedido.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  equipo:
+                    $ref: '#/components/schemas/Equipo'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+        '503':
+          $ref: '#/components/responses/ErrorDeBase'
+
+    put:
+      tags: [equipos]
+      summary: Actualiza un equipo existente
+      operationId: actualizarEquipo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipoRequest'
+      responses:
+        '200':
+          description: Equipo actualizado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  equipo:
+                    $ref: '#/components/schemas/Equipo'
+        '400':
+          $ref: '#/components/responses/ErrorDeValidacion'
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+        '503':
+          $ref: '#/components/responses/ErrorDeBase'
+
+    delete:
+      tags: [equipos]
+      summary: Elimina un equipo
+      operationId: eliminarEquipo
+      responses:
+        '200':
+          description: Equipo eliminado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  eliminado:
+                    type: integer
+                    example: 7
+        '404':
+          $ref: '#/components/responses/NoEncontrado'
+        '503':
+          $ref: '#/components/responses/ErrorDeBase'
+
+components:
+  schemas:
+    Equipo:
+      type: object
+      description: >
+        Un equipo del inventario. `tipo` va como CLAVE y no como etiqueta legible
+        ("laptop" y no "Laptop"): la etiqueta depende del idioma y Django la
+        deriva con get_tipo_display() sobre su propio modelo.
+      required: [id, nombre, tipo, disponible]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 7
+        nombre:
+          type: string
+          maxLength: 100
+          example: Notebook Lenovo ThinkPad
+        tipo:
+          type: string
+          enum: [laptop, proyector, tablet, camara]
+          example: laptop
+        disponible:
+          type: boolean
+          example: true
+
+    EquipoRequest:
+      type: object
+      description: >
+        Cuerpo de POST y PUT. No lleva `id`: lo genera la base. Si `disponible` no
+        se manda, vale true (el mismo default que el modelo Django).
+      required: [nombre, tipo]
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Notebook Lenovo ThinkPad
+        tipo:
+          type: string
+          enum: [laptop, proyector, tablet, camara]
+          example: laptop
+        disponible:
+          type: boolean
+          default: true
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Mensaje legible del problema.
+        detalle:
+          type: string
+          description: Detalle tecnico. Solo aparece en errores de base de datos.
+
+  parameters:
+    IdEquipo:
+      in: path
+      name: id
+      required: true
+      description: Id del equipo.
+      schema:
+        type: integer
+        format: int64
+      example: 7
+
+  responses:
+    NoEncontrado:
+      description: No existe un equipo con ese id.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: No existe un equipo con id 99.
+
+    ErrorDeValidacion:
+      description: Faltan campos o `tipo` no es valido.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 'El campo "tipo" debe ser uno de: laptop, proyector, tablet, camara.'
+
+    ErrorDeBase:
+      # 503 y no 500: es el estado >= 500 que hace que la vista de Django avance al
+      # siguiente recurso de la cadena de lectura.
+      description: No se pudo completar la operacion por un fallo de la base de datos.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

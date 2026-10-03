@@ -1,0 +1,55 @@
+# Configuracion del microservicio Java.
+#
+# TODA la conexion sale de variables de entorno con un default pensado para
+# desarrollo local. No hay ninguna credencial escrita en este archivo: si se
+# deploya, la clave se setea en el panel del hosting y no en el repo.
+#
+# Se aceptan las mismas variables DB_* que leen Django y el microservicio Node,
+# para poder copiar un unico .env a los cuatro proyectos.
+
+server:
+  # Puerto configurable. Local: 8081. En un hosting de contenedores lo sobreescribe
+  # el entrypoint con -e PORT=..., que es lo que se publica.
+  port: ${PORT:8081}
+
+spring:
+  application:
+    name: microservicio-java
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:gestion_equipos}
+    username: ${DB_USER:gestion}
+    password: ${DB_PASSWORD:}
+    hikari:
+      # Pool chico a proposito: este servicio solo hace CRUD sobre una tabla de
+      # inventario, no hace falta abrir decenas de conexiones por proceso.
+      maximum-pool-size: ${DB_POOL_MAX:5}
+
+  jpa:
+    hibernate:
+      # `validate` y no `update`/`create`: la tabla laMigra Django con sus
+      # migraciones. Si este servicio la creara, se llevarian por delante los
+      # indices y las claves foraneas de prestamos que ya apuntan a equipo(id).
+      # Ademas, con `create-drop` cada reinicio borraria el inventario.
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        # Solo loguear SQL: hace falta ver las consultas para verificar que la
+        # tabla y los tipos son los que dice el mapeo.
+        format_sql: false
+
+# Springdoc: la documentacion sale de las anotaciones del controller.
+# Swagger UI queda en /swagger-ui.html y la especificacion en /v3/api-docs.
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # Ordena los endpoints por metodo (GET, POST, PUT, DELETE) en vez de
+    # mezclarlos, que es como se leen los cuatro del CRUD.
+    operations-sorter: method
+
+logging:
+  level:
+    com.gestion.equipos: INFO
