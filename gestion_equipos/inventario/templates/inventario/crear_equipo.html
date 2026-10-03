@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar equipo - Gestion de Equipos{% endblock %}
+
+{% block content %}
+    <h1>Agregar equipo</h1>
+    <div class="detail-card">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "inventario/_campos_equipo_form.html" %}
+
+            {% comment %}
+                Fallo del microservicio al que se le pidio guardar (Java o PHP).
+                Se muestra arriba de los botones para que se lea antes de volver a
+                apretar: el formulario sigue lleno con lo que escribio el usuario.
+            {% endcomment %}
+            {% if error_servicio %}
+                <div class="msg msg-error">{{ error_servicio }}</div>
+            {% endif %}
+
+            {% comment %}
+                Tres botones, tres caminos de guardado. No hace falta JavaScript:
+                cada boton es un submit con `name="metodo"` y su propio `value`, y el
+                navegador manda solo el del boton que se aprieto. La vista lee
+                request.POST["metodo"] y decide a quien le avisa.
+
+                El primero es el boton primario (`btn-submit`) porque guardar con
+                Python es el comportamiento de siempre: si el microservicio esta
+                caido, el usuario igual tiene una forma de cargar el equipo.
+            {% endcomment %}
+            <div class="form-acciones">
+                <button type="submit" name="metodo" value="python" class="btn-submit">
+                    Guardar con Python
+                </button>
+                <button type="submit" name="metodo" value="java" class="btn btn-primary">
+                    Guardar con Java
+                </button>
+                <button type="submit" name="metodo" value="php" class="btn btn-primary">
+                    Guardar con PHP
+                </button>
+                <a class="btn btn-primary" href="{% url 'inventario:lista_equipos' %}">Cancelar</a>
+            </div>
+
+            <p class="help-text" style="margin-top:12px;">
+                Los tres botones guardan en la misma base de datos, asi que el equipo
+                queda disponible para todo el sistema sin importar con cual se guarde.
+            </p>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar prestamo - Gestion de Equipos{% endblock %}
+
+{% block content %}
+    <h1>Agregar prestamo</h1>
+    <div class="detail-card">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "prestamos/_campos_prestamo_form.html" %}
+            <div class="form-acciones">
+                <button type="submit" class="btn-submit">Guardar prestamo</button>
+                <a class="btn btn-primary" href="{% url 'prestamos:lista_prestamos_activos' %}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

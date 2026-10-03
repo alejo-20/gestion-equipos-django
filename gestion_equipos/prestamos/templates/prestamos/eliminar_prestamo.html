@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar prestamo - Gestion de Equipos{% endblock %}
+
+{% block content %}
+    <h1>Eliminar prestamo</h1>
+    <div class="detail-card">
+        <p>Seguro que querés eliminar este prestamo?</p>
+        <p>
+            <strong>Equipo:</strong> {{ prestamo.equipo.nombre }}<br>
+            <strong>Persona:</strong> {{ prestamo.nombre_persona }}<br>
+            <strong>Fecha de prestamo:</strong> {{ prestamo.fecha_prestamo|date:"d/m/Y H:i" }}
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Si, eliminar</button>
+            <a class="btn btn-primary" href="{% url 'prestamos:lista_prestamos_activos' %}">Cancelar</a>
+        </form>
+    </div>
+{% endblock %}

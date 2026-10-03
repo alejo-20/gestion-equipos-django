@@ -24,10 +24,20 @@
         .btn-success { background: #2e8b57; }
         .btn-danger { background: #c0392b; }
         .btn:hover { opacity: .85; }
+        button.btn { border: none; cursor: pointer; }
+        button.btn[type=submit] { padding: 8px 14px; }
         .detail-card { background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
         .detail-card p { margin: 8px 0; }
         input[type=text], button[type=submit] { padding: 10px 14px; border-radius: 6px; border: 1px solid #ccc; font-size: 1em; }
         .btn-submit { background: #2e8b57; color: #fff; border: none; cursor: pointer; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+        .form-group input[type=text], .form-group input[type=number], .form-group input[type=date], .form-group input[type=datetime-local], .form-group select { width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid #ccc; font-size: 1em; background: #fff; }
+        .form-group input[type=checkbox] { width: 18px; height: 18px; }
+        .form-group .msg { margin: 6px 0 0; }
+        .form-group .help-text { margin-top: 6px; color: #666; font-size: .85em; }
+        .form-acciones { margin-top: 20px; }
+        .form-acciones .btn, .form-acciones .btn-submit { margin-right: 8px; }
         .msg { padding: 12px; border-radius: 6px; margin-bottom: 16px; }
         .msg-info { background: #d9edf7; color: #1f3a5f; }
         .msg-error { background: #f8d7da; color: #842029; }
@@ -38,6 +48,7 @@
     <nav>
         <a href="{% url 'inventario:lista_equipos' %}">Inventario</a>
         <a href="{% url 'prestamos:lista_prestamos_activos' %}">Prestamos activos</a>
+        <a href="{% url 'chatbot:chat' %}">Asistente</a>
         <a href="/admin/">Admin</a>
     </nav>
     <main>

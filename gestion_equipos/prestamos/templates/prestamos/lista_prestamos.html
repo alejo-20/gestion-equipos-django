@@ -4,6 +4,9 @@
 
 {% block content %}
     <h1>Prestamos activos</h1>
+    <p style="margin-bottom:16px;">
+        <a class="btn btn-success" href="{% url 'prestamos:crear_prestamo' %}">Agregar prestamo</a>
+    </p>
     {% if prestamos %}
     <table>
         <thead>
@@ -22,6 +25,8 @@
                 <td>{{ prestamo.fecha_prestamo|date:"d/m/Y H:i" }}</td>
                 <td>
                     <a class="btn btn-danger" href="{% url 'prestamos:devolver_prestamo' prestamo.id %}">Registrar devolucion</a>
+                    <a class="btn btn-success" href="{% url 'prestamos:editar_prestamo' prestamo.id %}">Editar</a>
+                    <a class="btn btn-danger" href="{% url 'prestamos:eliminar_prestamo' prestamo.id %}">Eliminar</a>
                 </td>
             </tr>
             {% endfor %}

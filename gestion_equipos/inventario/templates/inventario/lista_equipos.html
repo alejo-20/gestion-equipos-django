@@ -4,6 +4,21 @@
 
 {% block content %}
     <h1>Inventario de equipos</h1>
+
+    {% comment %}
+        De donde salieron los datos de esta tabla. El listado se lee del
+        microservicio Node, y si no responde, del de Java, del de PHP y por ultimo
+        del ORM de Django. Verlo en pantalla sirve para dos cosas: depurar cual
+        servicio esta caido, y avisarle al usuario que puede estar viendo datos
+        viejos si cayo la cadena entera.
+    {% endcomment %}
+    <p class="msg msg-info" style="margin-bottom:16px;">
+        Datos servidos por: <strong>{{ origen_datos }}</strong>
+    </p>
+
+    <p style="margin-bottom:16px;">
+        <a class="btn btn-success" href="{% url 'inventario:crear_equipo' %}">Agregar equipo</a>
+    </p>
     <table>
         <thead>
             <tr>
@@ -27,6 +42,8 @@
                 </td>
                 <td>
                     <a class="btn btn-primary" href="{% url 'inventario:detalle_equipo' equipo.id %}">Ver detalle</a>
+                    <a class="btn btn-success" href="{% url 'inventario:editar_equipo' equipo.id %}">Editar</a>
+                    <a class="btn btn-danger" href="{% url 'inventario:eliminar_equipo' equipo.id %}">Eliminar</a>
                 </td>
             </tr>
             {% empty %}

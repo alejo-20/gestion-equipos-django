@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Editar prestamo - Gestion de Equipos{% endblock %}
+
+{% block content %}
+    <h1>Editar prestamo</h1>
+    <div class="detail-card">
+        <p>
+            <strong>Equipo:</strong> {{ prestamo.equipo.nombre }}<br>
+            <strong>Fecha de prestamo:</strong> {{ prestamo.fecha_prestamo|date:"d/m/Y H:i" }}
+        </p>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "prestamos/_campos_prestamo_form.html" %}
+            <div class="form-acciones">
+                <button type="submit" class="btn-submit">Guardar cambios</button>
+                <a class="btn btn-primary" href="{% url 'prestamos:lista_prestamos_activos' %}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

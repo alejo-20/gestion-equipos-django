@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Asistente - Gestion de Equipos{% endblock %}
+
+{% block content %}
+<style>
+    .chat-wrap { max-width: 760px; margin: 0 auto; }
+    .chat-info { margin-bottom: 16px; }
+    .chat-box {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.1);
+        padding: 16px;
+        min-height: 380px;
+        max-height: 60vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .msg-burbuja { max-width: 80%; padding: 10px 14px; border-radius: 12px; line-height: 1.45; white-space: pre-wrap; }
+    .msg-bot { align-self: flex-start; background: #f0f4f8; color: #333; border-bottom-left-radius: 4px; }
+    .msg-user { align-self: flex-end; background: #1f3a5f; color: #fff; border-bottom-right-radius: 4px; }
+    .msg-error { align-self: flex-start; background: #f8d7da; color: #842029; border-bottom-left-radius: 4px; }
+    .msg-vacio { text-align: center; color: #888; font-size: .9em; padding: 24px 0; }
+    .chat-form { display: flex; gap: 8px; margin-top: 12px; }
+    .chat-form input[type=text] { flex: 1; }
+    .chat-form button { white-space: nowrap; }
+    .chat-enviando { color: #888; font-size: .85em; font-style: italic; }
+    .sugerencias { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .sugerencias button {
+        background: #fff; border: 1px solid #ccd; border-radius: 14px;
+        padding: 6px 12px; font-size: .85em; cursor: pointer; color: #1f3a5f;
+    }
+    .sugerencias button:hover { background: #f0f4f8; }
+</style>
+
+<h1>Asistente</h1>
+
+<div class="chat-wrap">
+    <p class="chat-info msg msg-info">
+        Pregunta sobre el inventario y los prestamos. Ejemplo: <em>quien tiene el proyector</em>
+        o <em>cuanto se ha gastado en mantenimiento de la laptop Dell</em>.
+    </p>
+
+    {% if not api_habilitada %}
+        <p class="msg msg-error">
+            El chatbot no esta configurado: falta la variable <code>GEMINI_API_KEY</code>
+            en el archivo <code>.env</code>.
+        </p>
+    {% endif %}
+
+    <div class="chat-box" id="chat-box">
+        <p class="msg-vacio" id="chat-vacio">No hay mensajes todavia. Escribe una pregunta.</p>
+    </div>
+
+    <form class="chat-form" id="chat-form">
+        {% csrf_token %}
+        <input type="text" id="chat-input" name="mensaje"
+               placeholder="Escribe tu pregunta..." maxlength="500" autocomplete="off">
+        <button type="submit" class="btn-submit" id="chat-enviar">Enviar</button>
+    </form>
+
+    <div class="sugerencias">
+        <button type="button" data-texto="Que equipos hay disponibles ahora mismo?">Equipos disponibles</button>
+        <button type="button" data-texto="Quem tiene el proyector Epson?">Quien tiene el proyector</button>
+        <button type="button" data-texto="Cuanto se ha gastado en mantenimiento de cada equipo?">Costo de mantenimiento</button>
+        <button type="button" data-texto="Que equipos estan prestados y desde cuando?">Prestamos activos</button>
+    </div>
+</div>
+
+<script src="{% static 'chatbot/chat.js' %}"></script>
+{% endblock %}

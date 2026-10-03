@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar equipo - Gestion de Equipos{% endblock %}
+
+{% block content %}
+    <h1>Eliminar equipo</h1>
+    <div class="detail-card">
+        <p>Seguro que querés eliminar este equipo?</p>
+        <p>
+            <strong>Nombre:</strong> {{ equipo.nombre }}<br>
+            <strong>Tipo:</strong> {{ equipo.get_tipo_display }}
+        </p>
+        {% if equipo.prestamos.exists %}
+            <div class="msg msg-error">
+                Este equipo tiene prestamos asociados y tambien va a eliminarse.
+            </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Si, eliminar</button>
+            <a class="btn btn-primary" href="{% url 'inventario:detalle_equipo' equipo.id %}">Cancelar</a>
+        </form>
+    </div>
+{% endblock %}

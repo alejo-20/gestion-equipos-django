@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Editar equipo - Gestion de Equipos{% endblock %}
+
+{% block content %}
+    <h1>Editar equipo</h1>
+    <div class="detail-card">
+        <p><strong>Equipo:</strong> {{ equipo.nombre }}</p>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "inventario/_campos_equipo_form.html" %}
+            <div class="form-acciones">
+                <button type="submit" class="btn-submit">Guardar cambios</button>
+                <a class="btn btn-primary" href="{% url 'inventario:detalle_equipo' equipo.id %}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
